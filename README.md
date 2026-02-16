@@ -111,9 +111,3 @@ curl -X PATCH http://localhost:8080/products/1 \
   }'
 ```
 
-## Key Features
-
-- **In-memory storage**: Uses a map to store products (data resets on restart)
-- **Thread-safe**: Uses mutexes to handle concurrent requests
-- **RESTful**: Follows REST conventions for HTTP methods and status codes
-- **JSON responses**: All data exchanged in JSON format
