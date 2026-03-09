@@ -13,7 +13,7 @@ go mod tidy
 2. Run the server:
 
 ```bash
-go run main.go
+go run cmd/main.go
 ```
 
 The server will start on `http://localhost:8080`

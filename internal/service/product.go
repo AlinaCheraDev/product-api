@@ -1,8 +1,7 @@
-package main
+package service
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -13,7 +12,7 @@ type Product struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
-	IsActive		bool    `json:"isActive"`
+	IsActive    bool    `json:"isActive"`
 }
 
 // Store products in memory
@@ -27,27 +26,13 @@ var store = ProductStore{
 	nextID:   1,
 }
 
-func main() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/products", GetProducts).Methods("GET")
-	router.HandleFunc("/products/{id}", GetProduct).Methods("GET")
-	router.HandleFunc("/products", CreateProduct).Methods("POST")
-	router.HandleFunc("/products/{id}", UpdateProduct).Methods("PUT")
-	router.HandleFunc("/products/{id}", DeleteProduct).Methods("DELETE")
-	router.HandleFunc("/products/{id}", PatchProductStatus).Methods("PATCH")
-
-	log.Println("Server starting on :8080...")
-	log.Fatal(http.ListenAndServe(":8080", router))
-}
-
 // GET /products
 func GetProducts(w http.ResponseWriter, r *http.Request) {
 	products := make([]Product, 0, len(store.products))
 	for _, product := range store.products {
 		products = append(products, product)
 	}
-
+	
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(products)
 }
