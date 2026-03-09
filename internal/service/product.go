@@ -5,31 +5,15 @@ import (
 	"net/http"
 	"strconv"
 
+	"product-api/internal/database"
+
 	"github.com/gorilla/mux"
 )
 
-type Product struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	IsActive    bool    `json:"isActive"`
-}
-
-// Store products in memory
-type ProductStore struct {
-	products map[int]Product
-	nextID   int
-}
-
-var store = ProductStore{
-	products: make(map[int]Product),
-	nextID:   1,
-}
-
 // GET /products
 func GetProducts(w http.ResponseWriter, r *http.Request) {
-	products := make([]Product, 0, len(store.products))
-	for _, product := range store.products {
+	products := make([]database.Product, 0, len(database.Store.Products))
+	for _, product := range database.Store.Products {
 		products = append(products, product)
 	}
 	
@@ -46,7 +30,7 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, exists := store.products[id]
+	product, exists := database.Store.Products[id]
 
 	if !exists {
 		http.Error(w, "Product not found", http.StatusNotFound)
@@ -59,15 +43,15 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 
 // POST /products
 func CreateProduct(w http.ResponseWriter, r *http.Request) {
-	var product Product
+	var product database.Product
 	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	product.ID = store.nextID
-	store.nextID++
-	store.products[product.ID] = product
+	product.ID = database.Store.NextID
+	database.Store.NextID++
+	database.Store.Products[product.ID] = product
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -83,19 +67,19 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var product Product
+	var product database.Product
 	if err := json.NewDecoder(r.Body).Decode(&product); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	if _, exists := store.products[id]; !exists {
+	if _, exists := database.Store.Products[id]; !exists {
 		http.Error(w, "Product not found", http.StatusNotFound)
 		return
 	}
 
 	product.ID = id
-	store.products[id] = product
+	database.Store.Products[id] = product
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(product)
@@ -110,12 +94,12 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, exists := store.products[id]; !exists {
+	if _, exists := database.Store.Products[id]; !exists {
 		http.Error(w, "Product not found", http.StatusNotFound)
 		return
 	}
 
-	delete(store.products, id)
+	delete(database.Store.Products, id)
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -136,14 +120,14 @@ func PatchProductStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product, exists := store.products[id]
+	product, exists := database.Store.Products[id]
 	if !exists {
 		http.Error(w, "Product not found", http.StatusNotFound)
 		return
 	}
 
 	product.IsActive = statusUpdate.IsActive
-	store.products[id] = product
+	database.Store.Products[id] = product
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(product)
