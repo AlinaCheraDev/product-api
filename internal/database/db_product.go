@@ -18,3 +18,15 @@ var Store = ProductStore{
 	Products: make(map[int]Product),
 	NextID:   1,
 }
+
+func (ps *ProductStore) SeedProducts(n int) {
+	for i := 0; i < n; i++ {
+		ps.Products[ps.NextID] = Product{
+			ID:          ps.NextID,
+			Name:        "Product " + string(rune(65+i)),
+			Description: "Sample product description",
+			IsActive:    true,
+		}
+		ps.NextID++
+	}
+}

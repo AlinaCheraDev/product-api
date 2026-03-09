@@ -5,10 +5,23 @@ import (
 	"net/http"
 	"product-api/internal/service"
 
+	"os"
+	"product-api/internal/database"
+
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	shouldSeed := false
+	for _, arg := range os.Args[1:] {
+			if arg == "--seed" {
+					shouldSeed = true
+			}
+	}
+	if shouldSeed {
+			database.Store.SeedProducts(50)
+	}
+
 	router := mux.NewRouter()
 
 	router.HandleFunc("/products", service.GetProducts).Methods("GET")

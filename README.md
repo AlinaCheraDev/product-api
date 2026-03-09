@@ -16,7 +16,27 @@ go mod tidy
 go run cmd/main.go
 ```
 
+or, if I want to database seeded:
+
+```bash
+go run cmd/main.go --seed
+```
+
 The server will start on `http://localhost:8080`
+
+3. Test the API:
+
+- simple tests:
+
+```bash
+./test.sh
+```
+
+- performance tests (requires k6 to be installed):
+
+```bash
+k6 run internal/test/k6_products.js
+```
 
 ## API Endpoints
 
